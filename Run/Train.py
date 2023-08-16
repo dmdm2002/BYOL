@@ -17,7 +17,7 @@ class Trainer(Param):
         super(Trainer, self).__init__()
 
     def run(self):
-        net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+        net = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
         model = BYOL(net=net).to(self.device)
 
         optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
@@ -25,13 +25,19 @@ class Trainer(Param):
         transform = transforms.Compose(
             [
                 transforms.Resize((256, 256)),
-                transforms.RandomCrop((224, 224)),
+                transforms.RandomResizedCrop((224, 224)),
+                transforms.ColorJitter(0.8, 0.8, 0.8, 0.2),
+                transforms.RandomHorizontalFlip(p=0.5),
                 transforms.ToTensor(),
+                transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             ]
         )
 
-        tr_dataset = CustomDataset(self.db_path, run_type='train', cls=None, transform=transform)
+        tr_dataset = CustomDataset(self.db_path, run_type='train', cls=['cats'], transform=transform)
         tr_loader = DataLoader(dataset=tr_dataset, batch_size=self.batchsz, shuffle=True)
+
+        te_dataset = CustomDataset(self.db_path, run_type='test_set', cls=['cats'], transform=transform)
+        te_loader = DataLoader(dataset=tr_dataset, batch_size=self.batchsz, shuffle=False)
 
         for ep in range(0, self.full_epoch):
             total_loss = 0.
@@ -59,8 +65,6 @@ class Trainer(Param):
 
             if self.do_knn:
                 knn_model = KNN(model, k=2)
-                knn_acc = knn_model.fit(tr_loader)
+                knn_acc = knn_model.fit(te_loader)
 
                 print(f'KNN test: {knn_acc}')
-
-

@@ -11,18 +11,29 @@ class CustomDataset(data.Dataset):
 
         self.transform = transform
         self.run_type = run_type
-        self.folder = glob.glob(f'{os.path.join(dataset_dir, run_type)}/*')
+
+        folder_A = glob.glob(f'{os.path.join(dataset_dir, run_type, cls[0])}/*')
+        folder_B = glob.glob(f'{os.path.join(dataset_dir, run_type, cls[1])}/*')
+        self.image_path = []
+
+        for i in range(len(folder_A)):
+            self.image_path.append([folder_A[i], 0])
+
+        for i in range(len(folder_B)):
+            self.image_path.append([folder_B[i], 1])
 
     def __getitem__(self, index):
         if self.run_type=='train':
-            v1 = self.transform(Image.open(self.folder[index]))
-            v2 = self.transform(Image.open(self.folder[index]))
+            v1 = self.transform(Image.open(self.image_path[index][0]))
+            v2 = self.transform(Image.open(self.image_path[index][0]))
+            label = self.image_path[index][1]
 
             return [v1, v2]
         else:
             v1 = self.transform(Image.open(self.folder[index]))
+            label = self.image_path[index][1]
 
-            return v1
+            return [v1, label]
 
     def __len__(self):
-        return len(self.folder)
+        return len(self.image_path)
