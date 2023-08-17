@@ -33,11 +33,11 @@ class Trainer(Param):
             ]
         )
 
-        tr_dataset = CustomDataset(self.db_path, run_type='train', cls=['cats'], transform=transform)
+        tr_dataset = CustomDataset(self.db_path, run_type='train', cls=['cats', 'dogs'], transform=transform)
         tr_loader = DataLoader(dataset=tr_dataset, batch_size=self.batchsz, shuffle=True)
 
-        te_dataset = CustomDataset(self.db_path, run_type='test_set', cls=['cats'], transform=transform)
-        te_loader = DataLoader(dataset=tr_dataset, batch_size=self.batchsz, shuffle=False)
+        te_dataset = CustomDataset(self.db_path, run_type='test_set', cls=['cats', 'dogs'], transform=transform)
+        te_loader = DataLoader(dataset=te_dataset, batch_size=self.batchsz, shuffle=False)
 
         for ep in range(0, self.full_epoch):
             total_loss = 0.

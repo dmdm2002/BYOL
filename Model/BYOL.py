@@ -12,6 +12,7 @@ class BYOL(nn.Module):
                  net,
                  batch_norm_mlp=True,
                  in_features=512,
+                 layer_name='fc',
                  projection_size=256,
                  projection_hidden_size=2049,
                  moving_average_decay=0.99,
@@ -23,6 +24,7 @@ class BYOL(nn.Module):
         self.online_model = ProjHeadModel(
             model=net,
             in_features=in_features,
+            layer_name=layer_name,
             embedding_size=projection_size,
             hidden_size=projection_hidden_size,
             batch_norm_mlp=batch_norm_mlp

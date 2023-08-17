@@ -9,7 +9,7 @@ from Utils.Options import Param
 
 
 class KNN(Param):
-    def __init__(self, model, k, ):
+    def __init__(self, model, k):
         super(KNN, self).__init__()
 
         self.k = k
@@ -22,7 +22,7 @@ class KNN(Param):
         label_lst = []
 
         with torch.no_grad():
-            for (item, label) in enumerate(loader):
+            for idx, (item, label) in enumerate(loader):
                 h = self.model(item.to(self.device))
                 features.append(h)
 
@@ -33,7 +33,7 @@ class KNN(Param):
             h_total = torch.stack(features)
             label_total = torch.stack(label_lst)
 
-            return x_total, h_total, label_total
+        return x_total, h_total, label_total
 
     def knn(self, features, labels, k=1):
         feature_dim = features.shape[-1]
